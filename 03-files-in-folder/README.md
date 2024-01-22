@@ -27,9 +27,9 @@ Steps to complete the task:
 
 ### Tips
 
-Check [this article](https://www.freecodecamp.org/news/what-is-gitkeep/) to fill in possible gaps in understanding how git works and to eliminate questions about reading files in subfolders.
+Check [this article](https://www.freecodecamp.org/news/what-is-gitkeep/) to fill in possible gaps in understanding how git works and to eliminate questions about reading files in sub folders.
 
-To read the contents of a folder, use the [readdir function](https://nodejs.org/dist/latest-v16.x/docs/api/fs.html#fspromisesreaddirpath-options) from the **fs/promises module**. This function allows you to get the names of all files in a specified directory.
+To read the contents of a folder, use the [read dir function](https://nodejs.org/dist/latest-v16.x/docs/api/fs.html#fspromisesreaddirpath-options) from the **fs/promises module**. This function allows you to get the names of all files in a specified directory.
 
 After reading the folder's contents, if you set the option `{withFileTypes: true}`, each object in it will be represented as an instance of the [Dirent class](https://nodejs.org/dist/latest-v16.x/docs/api/fs.html#fs_class_fs_dirent). Its methods will help you determine whether the object is a file.
 
