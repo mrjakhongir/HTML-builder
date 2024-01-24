@@ -1,34 +1,26 @@
-const { mkdir, readdir } = require('node:fs/promises');
-const fsPromises = require('fs').promises;
+const { mkdir, readdir, readFile, writeFile } = require('node:fs/promises');
 const fs = require('fs');
 const path = require('path');
 
 async function copyDir() {
-  if (!fs.existsSync(path.join(__dirname, 'project-dist'))) {
-    await mkdir(path.join(__dirname, 'project-dist'), { recursive: true });
-  }
-  if (!fs.existsSync(path.join(__dirname, 'project-dist', 'assets'))) {
-    await mkdir(path.join(__dirname, 'project-dist', 'assets'), {
-      recursive: true,
-    });
-  }
+  await mkdir(path.join(__dirname, 'project-dist'), { recursive: true });
+
+  await mkdir(path.join(__dirname, 'project-dist', 'assets'), {
+    recursive: true,
+  });
+
   const folders = await readdir(path.join(__dirname, 'assets'), {
     withFileTypes: true,
   });
 
   for (let folder of folders) {
-    if (
-      !fs.existsSync(
-        path.join(__dirname, 'project-dist', 'assets', folder.name),
-      )
-    ) {
-      await mkdir(path.join(__dirname, 'project-dist', 'assets', folder.name), {
-        recursive: true,
-      });
-    }
+    await mkdir(path.join(__dirname, 'project-dist', 'assets', folder.name), {
+      recursive: true,
+    });
     const files = await readdir(path.join(__dirname, 'assets', folder.name), {
       withFileTypes: true,
     });
+
     for (let file of files) {
       const readableStream = fs.createReadStream(
         path.join(__dirname, 'assets', folder.name, file.name),
@@ -65,18 +57,44 @@ async function bundleStyles() {
   }
 }
 
-async function getArticle() {
-  let a = await fsPromises.readFile(
+async function bundleHTML() {
+  await copyMainFile(
     path.join(__dirname, 'template.html'),
+    path.join(__dirname, 'project-dist', 'index.html'),
+  );
+  let HTMLfile = await readFile(
+    path.join(__dirname, 'project-dist', 'index.html'),
     'utf-8',
   );
-  let b = await fsPromises.readFile(
-    path.join(__dirname, 'components', 'articles.html'),
-    'utf-8',
+  const components = await readdir(path.join(__dirname, 'components'), {
+    withFileTypes: true,
+  });
+
+  const newHTML = await replaceTags(
+    HTMLfile,
+    components,
+    path.join(__dirname, 'components'),
   );
-  a.replace('{{articles}}', b);
+  await writeFile(path.join(__dirname, 'project-dist', 'index.html'), newHTML);
+}
+
+async function copyMainFile(pathToFile, bundleFile) {
+  const content = await readFile(pathToFile, 'utf-8');
+  await writeFile(bundleFile, content);
+}
+
+async function replaceTags(HTMLfile, files, pathDir) {
+  for (let i = 0; i < files.length; i += 1) {
+    const filePath = path.join(pathDir, files[i].name);
+    if (files[i].isFile() && path.extname(filePath) === '.html') {
+      const fileName = files[i].name.slice(0, files[i].name.lastIndexOf('.'));
+      const fileData = await readFile(filePath, 'utf-8');
+      HTMLfile = HTMLfile.replace(`{{${fileName}}}`, fileData);
+    }
+  }
+  return HTMLfile;
 }
 
 copyDir();
 bundleStyles();
-getArticle();
+bundleHTML();

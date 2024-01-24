@@ -6,12 +6,10 @@ async function copyDir() {
   const newFilesPath = path.join(__dirname, 'files-copy');
   const oldFilesPath = path.join(__dirname, 'files');
 
-  if (!fs.existsSync(newFilesPath)) {
-    await mkdir(newFilesPath, { recursive: true });
-  }
+  await mkdir(newFilesPath, { recursive: true });
 
   const files = await readdir(oldFilesPath, { withFileTypes: true });
-  
+
   for (let file of files) {
     const readableStream = fs.createReadStream(
       path.join(oldFilesPath, file.name),
