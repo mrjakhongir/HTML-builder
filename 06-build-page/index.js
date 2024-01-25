@@ -23,8 +23,7 @@ async function copyDir() {
 
     for (let file of files) {
       const readableStream = fs.createReadStream(
-        path.join(__dirname, 'assets', folder.name, file.name),
-        'utf-8',
+        path.join(__dirname, 'assets', folder.name, file.name)
       );
       const writableStream = fs.createWriteStream(
         path.join(__dirname, 'project-dist', 'assets', folder.name, file.name),
